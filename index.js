@@ -7,7 +7,9 @@ dotenv.config();
 const app = express();
 const PORT = 8000;
 
-let hostname = "localhost"
+// let hostname = "localhost"
+let hostname = "bridge-backend-6wcu.onrender.com"
+
 // let hostname = "192.168.11.45"
 
 app.use(cors({
@@ -62,5 +64,5 @@ app.delete('/deleteopendata/:_id', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Server is running on http://${hostname}:${PORT}`);
+    console.log(`Server is running on https://${hostname}:${PORT}`);
 });
