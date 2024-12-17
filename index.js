@@ -25,21 +25,21 @@ mongoose.connect(process.env.MONGO_URI)
 // スキーマとモデルの定義
 const locationSchema = new mongoose.Schema({
     _id: { type: String },
-    Date: Number,
+    bridge: String,
     Inspector: String,
-    Keisiki: String,
+    Tel: String,
     Id: String,
     Name: String,
-    Road: String,
-    Rank: String,
-    Tel: String,
-    bridge: String, // 新しいフィールド
     Kana: String,
+    Road: String,
     address: String,
+    Keisiki: String,
     birth: String,
     length: Number,
     width: Number,
     HowUse: String,
+    Date: Number,
+    Rank: String,
     Schedule: String,
     New: String,
     Ho1: String,
@@ -80,14 +80,25 @@ app.delete('/deleteopendata/:_id', async (req, res) => {
 });
 
 app.post('/postopendata', async (req, res) => {
-    console.log(req)
     try {
+
         const newData = new Location(req.body); // リクエストボディからデータを取得
+        console.log("Received data:", req.body);
         const savedData = await newData.save(); // データベースに保存
         res.status(201).json({ message: "データの作成に成功しました", item: savedData });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: '失敗しました' });
+    }
+});
+
+app.delete('/postopendata/:_id', async (req, res) => {
+    try {
+        const _id = req.params;
+        // PUTの処理を作りたいです。
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'データ取得に失敗しました' });
     }
 });
 
