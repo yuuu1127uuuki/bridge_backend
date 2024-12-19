@@ -92,15 +92,28 @@ app.post('/postopendata', async (req, res) => {
     }
 });
 
-app.delete('/postopendata/:_id', async (req, res) => {
+app.put('/putopendata/:_id', async (req, res) => {
     try {
-        const _id = req.params;
-        // PUTの処理を作りたいです。
+        const { _id } = req.params; // URLパラメータからIDを取得
+        const updateData = req.body; // リクエストボディから更新データを取得
+
+        // MongoDBで該当データを更新
+        const updatedItem = await Location.findByIdAndUpdate(_id, updateData, {
+            new: true, // 更新後のデータを返す
+            runValidators: true // バリデーションを有効にする
+        });
+
+        if (!updatedItem) {
+            return res.status(404).json({ message: "データが見つかりません" });
+        }
+
+        res.status(200).json({ message: "更新に成功しました", item: updatedItem });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'データ取得に失敗しました' });
+        res.status(500).json({ error: "データ更新に失敗しました" });
     }
 });
+
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://${hostname}:${PORT}`);
