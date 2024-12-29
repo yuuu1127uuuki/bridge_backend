@@ -40,15 +40,6 @@ const locationSchema = new mongoose.Schema({
     HowUse: String,
     Date: Number,
     Rank: String,
-    Schedule: String,
-    New: String,
-    Ho1: String,
-    Ho2: String,
-    Ho3: String,
-    Ho4: String,
-    Ho5: String,
-    Record: String,
-    Co: String,
 });
 
 const Location = mongoose.model('Location', locationSchema, 'chopsticks');
