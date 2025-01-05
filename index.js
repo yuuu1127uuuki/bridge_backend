@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors')
+const { logHistory, History } = require('./History');
 dotenv.config();
 
 const app = express();
@@ -57,12 +58,13 @@ app.get('/getopendata', async (req, res) => {
 
 app.delete('/deleteopendata/:_id', async (req, res) => {
     try {
-        const _id = req.params;
-        // console.log(_id)
-        const deleteItem = await Location.findByIdAndDelete(_id);
+        const { _id } = req.params;
+        const deleteItem = await Location.findById(_id);
         if (!deleteItem) {
             return res.status(404).json({ message: "データがありません" });
         }
+        await logHistory('DELETE', deleteItem);
+        await Location.findByIdAndDelete(_id);
         res.status(200).json({ message: "削除に成功しました", item: deleteItem });
     } catch (error) {
         console.error(error);
@@ -72,10 +74,10 @@ app.delete('/deleteopendata/:_id', async (req, res) => {
 
 app.post('/postopendata', async (req, res) => {
     try {
-
         const newData = new Location(req.body); // リクエストボディからデータを取得
         console.log("Received data:", req.body);
         const savedData = await newData.save(); // データベースに保存
+        await logHistory('POST', savedData);
         res.status(201).json({ message: "データの作成に成功しました", item: savedData });
     } catch (error) {
         console.error(error);
@@ -85,26 +87,36 @@ app.post('/postopendata', async (req, res) => {
 
 app.put('/putopendata/:_id', async (req, res) => {
     try {
-        const { _id } = req.params; // URLパラメータからIDを取得
-        const updateData = req.body; // リクエストボディから更新データを取得
+        const { _id } = req.params;
+        const updateData = req.body;
 
-        // MongoDBで該当データを更新
-        const updatedItem = await Location.findByIdAndUpdate(_id, updateData, {
-            new: true, // 更新後のデータを返す
-            runValidators: true // バリデーションを有効にする
-        });
-
-        if (!updatedItem) {
+        const existingData = await Location.findById(_id);
+        if (!existingData) {
             return res.status(404).json({ message: "データが見つかりません" });
         }
 
-        res.status(200).json({ message: "更新に成功しました", item: updatedItem });
+        console.log('Calling logHistory for PUT operation');
+        await logHistory('PUT', existingData);
+        console.log('logHistory called');
+
+        const updatedData = await Location.findByIdAndUpdate(_id, updateData, { new: true });
+        res.status(200).json({ message: "データの更新に成功しました", item: updatedData });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: "データ更新に失敗しました" });
+        res.status(500).json({ error: '更新に失敗しました' });
     }
 });
 
+// Historyデータを取得するエンドポイント
+app.get('/gethistory', async (req, res) => {
+    try {
+        const historyData = await History.find().sort({ timestamp: -1 }); // 最新順に取得
+        res.json(historyData);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: '履歴の取得に失敗しました' });
+    }
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://${hostname}:${PORT}`);
