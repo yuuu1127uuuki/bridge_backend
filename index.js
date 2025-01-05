@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors')
-const { logHistory } = require('./History');
+const { logHistory, History } = require('./History');
 dotenv.config();
 
 const app = express();
@@ -107,6 +107,16 @@ app.put('/putopendata/:_id', async (req, res) => {
     }
 });
 
+// Historyデータを取得するエンドポイント
+app.get('/gethistory', async (req, res) => {
+    try {
+        const historyData = await History.find().sort({ timestamp: -1 }); // 最新順に取得
+        res.json(historyData);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: '履歴の取得に失敗しました' });
+    }
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://${hostname}:${PORT}`);
