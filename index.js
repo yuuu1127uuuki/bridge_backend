@@ -6,7 +6,7 @@ const { logHistory, History } = require('./History');
 dotenv.config();
 
 const app = express();
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 
 let hostname = "localhost"
 // let hostname = "bridge-backend-6wcu.onrender.com"
