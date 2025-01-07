@@ -27,10 +27,6 @@ const logHistory = async (operation, data) => {
         // Mongooseドキュメントを純粋なオブジェクトに変換
         let plainData = data.toObject ? data.toObject() : data;
 
-        // 不要なフィールドを削除
-        delete plainData._id;
-        delete plainData.__v;
-
         console.log(`Logging history: Operation=${operation}, Data=${JSON.stringify(plainData)}`);
 
         // Historyエントリを作成
