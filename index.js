@@ -98,7 +98,7 @@ app.post('/postopendata', async (req, res) => {
 app.put('/putopendata/:_id', async (req, res) => {
     try {
         const { _id } = req.params;
-        const { Date, Rank } = req.body;
+        const updateData = req.body;
 
         const existingData = await Location.findById(_id);
         if (!existingData) {
@@ -120,8 +120,15 @@ app.put('/putopendata/:_id', async (req, res) => {
         existingData.Rank2 = existingData.Rank1;
         existingData.Date1 = existingData.Date;
         existingData.Rank1 = existingData.Rank;
-        existingData.Date = Date;
-        existingData.Rank = Rank;
+        existingData.Date = updateData.Date;
+        existingData.Rank = updateData.Rank;
+
+        // 他のフィールドも更新
+        for (const key in updateData) {
+            if (updateData.hasOwnProperty(key) && key !== 'Date' && key !== 'Rank') {
+                existingData[key] = updateData[key];
+            }
+        }
 
         const updatedData = await existingData.save();
         res.status(200).json({ message: "データの更新に成功しました", item: updatedData });
