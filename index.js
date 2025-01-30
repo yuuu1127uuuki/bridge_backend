@@ -109,28 +109,7 @@ app.put('/putopendata/:_id', async (req, res) => {
         await logHistory('PUT', existingData);
         console.log('logHistory called');
 
-        // シフトしてデータを更新
-        existingData.Date5 = existingData.Date4;
-        existingData.Rank5 = existingData.Rank4;
-        existingData.Date4 = existingData.Date3;
-        existingData.Rank4 = existingData.Rank3;
-        existingData.Date3 = existingData.Date2;
-        existingData.Rank3 = existingData.Rank2;
-        existingData.Date2 = existingData.Date1;
-        existingData.Rank2 = existingData.Rank1;
-        existingData.Date1 = existingData.Date;
-        existingData.Rank1 = existingData.Rank;
-        existingData.Date = updateData.Date;
-        existingData.Rank = updateData.Rank;
-
-        // 他のフィールドも更新
-        for (const key in updateData) {
-            if (updateData.hasOwnProperty(key) && key !== 'Date' && key !== 'Rank') {
-                existingData[key] = updateData[key];
-            }
-        }
-
-        const updatedData = await existingData.save();
+        const updatedData = await Location.findByIdAndUpdate(_id, updateData, { new: true });
         res.status(200).json({ message: "データの更新に成功しました", item: updatedData });
     } catch (error) {
         console.error(error);
